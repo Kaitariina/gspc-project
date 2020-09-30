@@ -21,21 +21,21 @@ public class CardsController
     /*---------- ---------- ---------- ---------- ----------*/
 
     [HttpGet]
-    [Route("getone")]
+    [Route("getone/{playerId:Guid}/{cardId:Guid}")]
     public Task<Card> GetCard(Guid playerId, Guid cardId)
     {
         return repository.GetCard(playerId, cardId);
     }
 
     [HttpGet]
-    [Route("getall")]
+    [Route("getall/{deckId:Guid}")]
     public Task<Card[]> GetAllCardsInDeck(Guid deckId)
     {
         return repository.GetAllCardsInDeck(deckId);
     }
 
-    [HttpGet]
-    [Route("delete")]
+    [HttpDelete]
+    [Route("delete/{cardId:Guid}")]
     public Task<Card> DeleteCard(Guid cardId)
     {
         return repository.DeleteCard(cardId);

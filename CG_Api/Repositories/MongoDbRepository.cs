@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
+using System.Collections.Generic;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -63,15 +64,28 @@ class MongoDbRepository : IRepository
     //
     public async Task<Deck> CreateDeck(Guid playerId)
     {
-        Player player = await Get(playerId);
-
-        var deckCreation = new CardMethods();
-        var deck = deckCreation.CreateADeck();
-
-        player.DecksOwned.Add(deck);
-
         var filter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
-        await _playerCollection.ReplaceOneAsync(filter, player);
+        var deckCreation = new CardMethods();
+
+        var deck = deckCreation.CreateADeck();
+        deck.Id = Guid.NewGuid();
+
+        var pushDeck = Builders<Player>.Update.Push(player => player.DecksOwned, deck);
+        FindOneAndUpdateOptions<Player> options = new FindOneAndUpdateOptions<Player>()
+        {
+            ReturnDocument = ReturnDocument.After
+        };
+        Player player = await _playerCollection.FindOneAndUpdateAsync(filter, pushDeck, options);
+        //en saanu tätä toimimaan? heitti "sequence has no elements" erroria
+        // Player player = await Get(playerId);
+
+        // var deckCreation = new CardMethods();
+        // var deck = deckCreation.CreateADeck();
+
+        // player.DecksOwned.Add(deck);
+
+        // var filter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        // await _playerCollection.ReplaceOneAsync(filter, player);
 
         return deck;
     }
@@ -128,21 +142,75 @@ class MongoDbRepository : IRepository
     // Card related
     // Getting cards, deleting cards
     //
-    public Task<Card> GetCard(Guid playerId, Guid cardId)
+    public async Task<Card> GetCard(Guid playerId, Guid cardId)
     {
-        throw new NotImplementedException();
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        for (int i = 0; i < player.DecksOwned.Count; i++)
+        {
+            foreach (var deck in player.DecksOwned)
+            {
+                foreach (var card in deck.Cards_InDeck)
+                {
+                    if (card.Id == cardId)
+                        return card;
+                }
+            }
+        }
+        return null;
     }
 
-    public Task<Card[]> GetAllCardsInDeck(Guid deckId)
+    public async Task<Card[]> GetAllCardsInDeck(Guid deckId)
     {
-        throw new NotImplementedException();
+        FilterDefinition<Deck> deckFilter = Builders<Deck>.Filter.Eq(deck => deck.Id, deckId);
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.ElemMatch(player => player.DecksOwned, deckFilter);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+        List<Card> cardList = new List<Card>();
+
+        for (int i = 0; i < player.DecksOwned.Count; i++)
+        {
+            foreach (var deck in player.DecksOwned)
+            {
+                if (deck.Cards_InDeck.Count > 0)
+                {
+                    foreach (var card in deck.Cards_InDeck)
+                    {
+                        cardList.Add(card);
+                    }
+                    return cardList.ToArray();
+                }
+            }
+        }
+        return null;
     }
-    public Task<Card> DeleteCard(Guid cardId)
+    public async Task<Card> DeleteCard(Guid cardId)
     {
-        // FilterDefinition<Card> filter = Builders<Card>.Filter.Eq(c => c.Card_Id, cardId);
-        // return await _cardCollection.FindOneAndDeleteAsync(filter);
-        throw new NotImplementedException();
+        FilterDefinition<Card> filter = Builders<Card>.Filter.Eq(card => card.Id, cardId);
+        FilterDefinition<Deck> deckFilter = Builders<Deck>.Filter.ElemMatch(deck => deck.Cards_InDeck, filter);
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.ElemMatch(player => player.DecksOwned, deckFilter);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+        int x = 0;
 
+        for (int i = 0; i < player.DecksOwned.Count; i++)
+        {
+            foreach (var deck in player.DecksOwned)
+            {
+                if (deck.Cards_InDeck.Count > 0)
+                {
+                    foreach (var card in deck.Cards_InDeck)
+                    {
+                        if (card.Id == cardId)
+                        {
+                            deck.Cards_InDeck.RemoveAt(x);
+                            await _playerCollection.ReplaceOneAsync(playerFilter, player);
+                            return card;
+                        }
+                        x++;
+                    }
+                }
+            }
+        }
+        return null;
     }
-
 }

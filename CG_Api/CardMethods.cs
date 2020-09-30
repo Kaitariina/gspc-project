@@ -12,8 +12,8 @@ public class CardMethods
 
     public Deck CreateADeck()
     {
-
         var adeck = new Deck();
+        adeck.Cards_InDeck = new List<Card>();
 
         for (int i = 0; i < 9; i++)
         {
