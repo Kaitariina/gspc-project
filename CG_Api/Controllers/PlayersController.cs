@@ -30,7 +30,7 @@ public class PlayersController
         player = new Player()
         {
             Player_Id = Guid.NewGuid(),
-            Name = player.Name, //"Player" + (rnd.Next(1, 1000) + rnd.Next(1, 1000)).ToString(),
+            Name = player.Name,
             IsBanned = false,
             CreationTime = DateTime.UtcNow,
             DecksOwned = decks,
@@ -65,7 +65,6 @@ public class PlayersController
 
         return await repository.Delete(id);
     }
-
 
     /*---------- ---------- ---------- ---------- ----------*/
 

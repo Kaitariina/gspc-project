@@ -14,13 +14,11 @@ public class CardMethods
     {
 
         var adeck = new Deck();
-        var deckSize = rnd.Next(5, 10);
 
-
-        for (int i = 0; i < deckSize; i++)
+        for (int i = 0; i < 9; i++)
         {
 
-            int raffle = rnd.Next(1, 3);
+            int raffle = rnd.Next(1, 4);
 
             switch (raffle)
             {
@@ -48,9 +46,9 @@ public class CardMethods
         {
             Card_Id = Guid.NewGuid(),
             Class = CardClassType.MAGE,
-            Rarity = rnd.Next(0, 5),
-            Attack = rnd.Next(0, 9),
-            Defence = rnd.Next(1, 9)
+            Rarity = rnd.Next(0, 6),            //returns 0 - 6
+            Attack = rnd.Next(0, 10),           //returns 0 - 9
+            Defence = rnd.Next(1, 10)           //returns 0 - 9
         };
 
         if (card.Attack == 0)
@@ -69,11 +67,14 @@ public class CardMethods
         {
             Card_Id = Guid.NewGuid(),
             Class = CardClassType.HUNTER,
-            Rarity = rnd.Next(0, 3),
-            Attack = rnd.Next(4, 7),
-            Defence = rnd.Next(3, 5)
+            Rarity = rnd.Next(0, 4),            //returns 0 - 3
+            Attack = rnd.Next(4, 8),            //returns 4 - 7
+            Defence = rnd.Next(3, 6)            //returns 3 - 5
         };
 
+        // If the defence value is lowest,
+        // the card is taunt 
+        // 
         if (card.Defence == 3)
         {
             card.Taunt = true;
@@ -91,9 +92,9 @@ public class CardMethods
         {
             Card_Id = Guid.NewGuid(),
             Class = CardClassType.NINJA,
-            Rarity = rnd.Next(3, 5),
-            Attack = rnd.Next(6, 8),
-            Defence = rnd.Next(1, 3),
+            Rarity = rnd.Next(3, 6),            //returns 3 - 5
+            Attack = rnd.Next(6, 9),            //returns 6 - 8
+            Defence = rnd.Next(1, 4),           //returns 1 - 3
             Taunt = false
         };
 

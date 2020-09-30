@@ -16,7 +16,7 @@ public class Card
     [EnumDataType(typeof(CardClassType))]
     public CardClassType Class { get; set; }
 
-    [Range(0, 5)]
+    [Range(1, 4)]
     public int Rarity { get; set; }
 
     [Range(0, 9)]

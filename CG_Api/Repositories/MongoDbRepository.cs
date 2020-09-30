@@ -11,9 +11,9 @@ using MongoDB.Driver;
 class MongoDbRepository : IRepository
 {
     private readonly IMongoCollection<Player> _playerCollection;
-    private readonly IMongoCollection<Card> _cardCollection;
+    //private readonly IMongoCollection<Card> _cardCollection;
     private readonly IMongoCollection<BsonDocument> _bsonDocumentCollection1;
-    private readonly IMongoCollection<BsonDocument> _bsonDocumentCollection2;
+    //private readonly IMongoCollection<BsonDocument> _bsonDocumentCollection2;
 
 
     public MongoDbRepository()
@@ -21,10 +21,10 @@ class MongoDbRepository : IRepository
         var mongoClient = new MongoClient("mongodb://localhost:27017");
         var database = mongoClient.GetDatabase("cardgame");
         _playerCollection = database.GetCollection<Player>("players");
-        _cardCollection = database.GetCollection<Card>("cards");
+        //_cardCollection = database.GetCollection<Card>("cards");
 
         _bsonDocumentCollection1 = database.GetCollection<BsonDocument>("players");
-        _bsonDocumentCollection2 = database.GetCollection<BsonDocument>("cards");
+        //_bsonDocumentCollection2 = database.GetCollection<BsonDocument>("cards");
     }
 
     /*---------- ---------- ---------- ---------- ----------*/
@@ -101,10 +101,12 @@ class MongoDbRepository : IRepository
     {
         throw new NotImplementedException();
     }
-    public async Task<Card> DeleteCard(Guid cardId)
+    public Task<Card> DeleteCard(Guid cardId)
     {
-        FilterDefinition<Card> filter = Builders<Card>.Filter.Eq(c => c.Card_Id, cardId);
-        return await _cardCollection.FindOneAndDeleteAsync(filter);
+        // FilterDefinition<Card> filter = Builders<Card>.Filter.Eq(c => c.Card_Id, cardId);
+        // return await _cardCollection.FindOneAndDeleteAsync(filter);
+        throw new NotImplementedException();
+
     }
 
 }
