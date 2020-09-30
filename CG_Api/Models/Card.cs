@@ -11,7 +11,7 @@ public enum CardClassType
 
 public class Card
 {
-    public Guid Card_Id { get; set; }
+    public Guid Id { get; set; }
 
     [EnumDataType(typeof(CardClassType))]
     public CardClassType Class { get; set; }

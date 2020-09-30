@@ -29,7 +29,7 @@ public class PlayersController
 
         player = new Player()
         {
-            Player_Id = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             Name = player.Name,
             IsBanned = false,
             CreationTime = DateTime.UtcNow,

@@ -12,7 +12,7 @@ public enum Theme
 
 public class World
 {
-    public Guid World_Id { get; set; }
+    public Guid Id { get; set; }
 
     [Range(0, 5)]
     public int Difficulty { get; set; }

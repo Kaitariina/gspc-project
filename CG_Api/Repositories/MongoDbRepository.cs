@@ -40,7 +40,7 @@ class MongoDbRepository : IRepository
 
     public Task<Player> Get(Guid id)
     {
-        var filter = Builders<Player>.Filter.Eq(player => player.Player_Id, id);
+        var filter = Builders<Player>.Filter.Eq(player => player.Id, id);
         return _playerCollection.Find(filter).FirstAsync();
     }
 
@@ -52,7 +52,7 @@ class MongoDbRepository : IRepository
 
     public async Task<Player> Delete(Guid id)
     {
-        FilterDefinition<Player> filter = Builders<Player>.Filter.Eq(p => p.Player_Id, id);
+        FilterDefinition<Player> filter = Builders<Player>.Filter.Eq(p => p.Id, id);
         return await _playerCollection.FindOneAndDeleteAsync(filter);
     }
 
@@ -70,7 +70,7 @@ class MongoDbRepository : IRepository
 
         player.DecksOwned.Add(deck);
 
-        var filter = Builders<Player>.Filter.Eq(player => player.Player_Id, playerId);
+        var filter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
         await _playerCollection.ReplaceOneAsync(filter, player);
 
         return deck;
@@ -83,11 +83,11 @@ class MongoDbRepository : IRepository
 
         foreach (var d in player.DecksOwned)
         {
-            if (d.Deck_Id == d.Deck_Id)
+            if (d.Id == d.Id)
             {
                 deletedDeck = d;
 
-                var filter_player = Builders<Player>.Filter.Eq(player => player.Player_Id, playerId);
+                var filter_player = Builders<Player>.Filter.Eq(player => player.Id, playerId);
                 await _playerCollection.ReplaceOneAsync(filter_player, player);
             }
         }
@@ -103,7 +103,7 @@ class MongoDbRepository : IRepository
         {
             foreach (var deck in player.DecksOwned)
             {
-                if (deck.Deck_Id == deckId)
+                if (deck.Id == deckId)
                 {
                     thisDeck = deck;
                 }

@@ -44,7 +44,7 @@ public class CardMethods
     {
         var card = new Card()
         {
-            Card_Id = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             Class = CardClassType.MAGE,
             Rarity = rnd.Next(0, 6),            //returns 0 - 6
             Attack = rnd.Next(0, 10),           //returns 0 - 9
@@ -65,7 +65,7 @@ public class CardMethods
     {
         var card = new Card()
         {
-            Card_Id = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             Class = CardClassType.HUNTER,
             Rarity = rnd.Next(0, 4),            //returns 0 - 3
             Attack = rnd.Next(4, 8),            //returns 4 - 7
@@ -90,7 +90,7 @@ public class CardMethods
     {
         var card = new Card()
         {
-            Card_Id = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             Class = CardClassType.NINJA,
             Rarity = rnd.Next(3, 6),            //returns 3 - 5
             Attack = rnd.Next(6, 9),            //returns 6 - 8

@@ -13,7 +13,7 @@ public enum Rank
 
 public class Player
 {
-    public Guid Player_Id { get; set; }
+    public Guid Id { get; set; }
     public string Name { get; set; }
     public bool IsBanned { get; set; }
     public DateTime CreationTime { get; set; }
