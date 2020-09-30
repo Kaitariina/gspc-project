@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 
 [ApiController]
-[Route("api/players/deck")]
+[Route("api/players/{playerId:Guid}/deck")]
 public class DecksController
 {
     private readonly ILogger<DecksController> logger;
@@ -28,21 +28,21 @@ public class DecksController
     }
 
     [HttpPost]
-    [Route("update")]
+    [Route("update/{deckId:Guid}")]
     public Task<Deck> UpdateDeck(Guid deckId, Card card)
     {
         return repository.UpdateDeck(deckId, card);
     }
 
     [HttpDelete]
-    [Route("del")]
+    [Route("del/{deckId:Guid}")]
     public Task<Deck> DeleteDeck(Guid deckId, Guid playerId)
     {
         return repository.DeleteDeck(deckId, playerId);
     }
 
     [HttpGet]
-    [Route("getone")]
+    [Route("getone/{deckId:Guid}")]
     public Task<Deck> GetDeck(Guid playerId, Guid deckId)
     {
         return repository.GetDeck(playerId, deckId);

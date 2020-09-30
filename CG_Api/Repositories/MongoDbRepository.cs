@@ -76,6 +76,7 @@ class MongoDbRepository : IRepository
             ReturnDocument = ReturnDocument.After
         };
         Player player = await _playerCollection.FindOneAndUpdateAsync(filter, pushDeck, options);
+
         //en saanu tätä toimimaan? heitti "sequence has no elements" erroria
         // Player player = await Get(playerId);
 
@@ -93,7 +94,9 @@ class MongoDbRepository : IRepository
     public async Task<Deck> DeleteDeck(Guid deckId, Guid playerId)
     {
         Deck deletedDeck = null;
-        Player player = await Get(playerId);
+
+        var playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
 
         foreach (var d in player.DecksOwned)
         {
@@ -111,7 +114,10 @@ class MongoDbRepository : IRepository
     public async Task<Deck> GetDeck(Guid playerId, Guid deckId)
     {
         Deck thisDeck = null;
-        Player player = await Get(playerId);
+
+        var playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
 
         if (player.DecksOwned.Count > 0)
         {
@@ -123,6 +129,7 @@ class MongoDbRepository : IRepository
                 }
             }
         }
+
         return thisDeck;
     }
 
