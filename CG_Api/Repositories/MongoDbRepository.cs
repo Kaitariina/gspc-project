@@ -12,7 +12,7 @@ class MongoDbRepository : IRepository
 {
     private readonly IMongoCollection<Player> _playerCollection;
     //private readonly IMongoCollection<Card> _cardCollection;
-    private readonly IMongoCollection<BsonDocument> _bsonDocumentCollection1;
+    private readonly IMongoCollection<BsonDocument> _bsonDocumentCollection;
     //private readonly IMongoCollection<BsonDocument> _bsonDocumentCollection2;
 
 
@@ -23,7 +23,7 @@ class MongoDbRepository : IRepository
         _playerCollection = database.GetCollection<Player>("players");
         //_cardCollection = database.GetCollection<Card>("cards");
 
-        _bsonDocumentCollection1 = database.GetCollection<BsonDocument>("players");
+        _bsonDocumentCollection = database.GetCollection<BsonDocument>("players");
         //_bsonDocumentCollection2 = database.GetCollection<BsonDocument>("cards");
     }
 
