@@ -13,9 +13,10 @@ public interface IRepository
     // Decks, cards
     //
     Task<Deck> CreateDeck(Guid playerId);
-    Task<Deck> UpdateDeck(Guid deckId, Card card);
-    Task<Deck> DeleteDeck(Guid deckId);
+    Task<Deck> DeleteDeck(Guid deckId, Guid playerId);
+    Task<Deck> GetDeck(Guid playerId, Guid deckId);
     Task<Deck[]> GetDecks(Guid playerId);
+    Task<Deck> UpdateDeck(Guid deckId, Card card);
 
 
     Task<Card> GetCard(Guid playerId, Guid cardId);

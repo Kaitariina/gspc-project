@@ -70,18 +70,54 @@ class MongoDbRepository : IRepository
 
         player.DecksOwned.Add(deck);
 
+        var filter = Builders<Player>.Filter.Eq(player => player.Player_Id, playerId);
+        await _playerCollection.ReplaceOneAsync(filter, player);
+
         return deck;
     }
 
-    public Task<Deck> DeleteDeck(Guid deckId)
+    public async Task<Deck> DeleteDeck(Guid deckId, Guid playerId)
     {
-        throw new NotImplementedException();
+        Deck deletedDeck = null;
+        Player player = await Get(playerId);
+
+        foreach (var d in player.DecksOwned)
+        {
+            if (d.Deck_Id == d.Deck_Id)
+            {
+                deletedDeck = d;
+
+                var filter_player = Builders<Player>.Filter.Eq(player => player.Player_Id, playerId);
+                await _playerCollection.ReplaceOneAsync(filter_player, player);
+            }
+        }
+        return deletedDeck;
     }
 
-    public Task<Deck[]> GetDecks(Guid playerId)
+    public async Task<Deck> GetDeck(Guid playerId, Guid deckId)
     {
-        throw new NotImplementedException();
+        Deck thisDeck = null;
+        Player player = await Get(playerId);
+
+        if (player.DecksOwned.Count > 0)
+        {
+            foreach (var deck in player.DecksOwned)
+            {
+                if (deck.Deck_Id == deckId)
+                {
+                    thisDeck = deck;
+                }
+            }
+        }
+        return thisDeck;
     }
+
+    public async Task<Deck[]> GetDecks(Guid playerId)
+    {
+        Player player = await Get(playerId);
+        return player.DecksOwned.ToArray();
+    }
+
     public Task<Deck> UpdateDeck(Guid deckId, Card card)
     {
         throw new NotImplementedException();

@@ -36,9 +36,16 @@ public class DecksController
 
     [HttpDelete]
     [Route("del")]
-    public Task<Deck> DeleteDeck(Guid deckId)
+    public Task<Deck> DeleteDeck(Guid deckId, Guid playerId)
     {
-        return repository.DeleteDeck(deckId);
+        return repository.DeleteDeck(deckId, playerId);
+    }
+
+    [HttpDelete]
+    [Route("getone")]
+    public Task<Deck> GetDeck(Guid playerId, Guid deckId)
+    {
+        return repository.GetDeck(playerId, deckId);
     }
 
     [HttpGet]
