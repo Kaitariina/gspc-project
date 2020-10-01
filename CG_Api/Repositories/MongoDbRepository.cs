@@ -95,19 +95,21 @@ class MongoDbRepository : IRepository
     {
         Deck deletedDeck = null;
 
-        var playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        FilterDefinition<Deck> deckFilter = Builders<Deck>.Filter.Eq(deck => deck.Id, deckId);
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.ElemMatch(player => player.DecksOwned, deckFilter);
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
 
-        foreach (var d in player.DecksOwned)
+        for (int i = 0; i < player.DecksOwned.Count; i++)
         {
-            if (d.Id == d.Id)
+            if (player.DecksOwned[i].Id == deckId)
             {
-                deletedDeck = d;
+                deletedDeck = player.DecksOwned[i];
 
-                var filter_player = Builders<Player>.Filter.Eq(player => player.Id, playerId);
-                await _playerCollection.ReplaceOneAsync(filter_player, player);
+                player.DecksOwned.RemoveAt(i);
+                await _playerCollection.ReplaceOneAsync(playerFilter, player);
             }
         }
+
         return deletedDeck;
     }
 
