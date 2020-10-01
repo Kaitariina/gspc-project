@@ -19,4 +19,5 @@ public class Player
     public DateTime CreationTime { get; set; }
     public List<Deck> DecksOwned { get; set; }
     public Rank Rank { get; set; }
+    public List<GameSession> Sessions { get; set; }
 }

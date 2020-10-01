@@ -12,8 +12,10 @@ using MongoDB.Driver;
 class MongoDbRepository : IRepository
 {
     private readonly IMongoCollection<Player> _playerCollection;
+    private readonly IMongoCollection<World> _worldCollection;
     //private readonly IMongoCollection<Card> _cardCollection;
     private readonly IMongoCollection<BsonDocument> _bsonDocumentCollection;
+    private readonly IMongoCollection<BsonDocument> _bsonDocumentCollectionw;
     //private readonly IMongoCollection<BsonDocument> _bsonDocumentCollection2;
 
 
@@ -22,9 +24,11 @@ class MongoDbRepository : IRepository
         var mongoClient = new MongoClient("mongodb://localhost:27017");
         var database = mongoClient.GetDatabase("cardgame");
         _playerCollection = database.GetCollection<Player>("players");
+        _worldCollection = database.GetCollection<World>("worlds");
         //_cardCollection = database.GetCollection<Card>("cards");
 
         _bsonDocumentCollection = database.GetCollection<BsonDocument>("players");
+        _bsonDocumentCollectionw = database.GetCollection<BsonDocument>("worlds");
         //_bsonDocumentCollection2 = database.GetCollection<BsonDocument>("cards");
     }
 
@@ -221,5 +225,68 @@ class MongoDbRepository : IRepository
             }
         }
         return null;
+    }
+
+    /*---------- ---------- ---------- ---------- ----------*/
+    // game related
+    // create session, worlds and get worlds
+    public async Task<GameSession> CreateSession(Guid player1, Guid player2, Guid worldId)
+    {
+        FilterDefinition<Player> filter1 = Builders<Player>.Filter.Eq(player => player.Id, player1);
+        FilterDefinition<Player> filter2 = Builders<Player>.Filter.Eq(player => player.Id, player2);
+        Player playerOne = await _playerCollection.Find(filter1).FirstAsync();
+        Player playerTwo = await _playerCollection.Find(filter2).FirstAsync();
+
+        FilterDefinition<World> filter = Builders<World>.Filter.Eq(world => world.Id, worldId);
+        World sessionWorld = await _worldCollection.Find(filter).FirstAsync();
+
+        var newSession = new GameSession()
+        {
+            Id = Guid.NewGuid(),
+            //muuta ajat loogisemmiksi
+            Time_Started = DateTime.Now,
+            Time_Finished = DateTime.Now,
+            World = sessionWorld,
+        };
+        if (playerOne.Sessions == null)
+            playerOne.Sessions = new List<GameSession>();
+        if (playerTwo.Sessions == null)
+            playerTwo.Sessions = new List<GameSession>();
+
+        playerOne.Sessions.Add(newSession);
+        playerTwo.Sessions.Add(newSession);
+
+        UpdateDefinition<World> updateSession = Builders<World>.Update.Inc(world => world.SessionCount, 1);
+
+        await _playerCollection.ReplaceOneAsync(filter1, playerOne);
+        await _playerCollection.ReplaceOneAsync(filter2, playerTwo);
+        sessionWorld = await _worldCollection.FindOneAndUpdateAsync(filter, updateSession);
+
+        return newSession;
+    }
+
+    public async Task<World[]> CreateWorlds()
+    {
+        List<World> list = new List<World>();
+        WorldMethods worlds = new WorldMethods();
+
+        var ruins = worlds.CreateWorldRuins();
+        var jungle = worlds.CreateWorldJungle();
+        var desert = worlds.CreateWorldDesert();
+        var lake = worlds.CreateWorldLake();
+
+        list.Add(ruins);
+        list.Add(jungle);
+        list.Add(desert);
+        list.Add(lake);
+        await _worldCollection.InsertManyAsync(list);
+
+        return list.ToArray();
+    }
+
+    public async Task<World[]> GetWorlds()
+    {
+        var worlds = await _worldCollection.Find(new BsonDocument()).ToListAsync();
+        return worlds.ToArray();
     }
 }

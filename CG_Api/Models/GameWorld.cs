@@ -17,4 +17,5 @@ public class World
     [Range(0, 5)]
     public int Difficulty { get; set; }
     public Theme Theme { get; set; }
+    public int SessionCount { get; set; }
 }

@@ -23,4 +23,8 @@ public interface IRepository
     Task<Card[]> GetAllCardsInDeck(Guid deckId);
     Task<Card> DeleteCard(Guid cardId);
 
+
+    Task<GameSession> CreateSession(Guid player1, Guid player2, Guid worldId);
+    public Task<World[]> CreateWorlds();
+    public Task<World[]> GetWorlds();
 }

@@ -65,7 +65,27 @@ public class PlayersController
 
         return await repository.Delete(id);
     }
+    //game session
+    [HttpPost]
+    [Route("createSession/{player1:Guid}/{player2:Guid}/{worldId:Guid}")]
+    public async Task<GameSession> CreateSession(Guid player1, Guid player2, Guid worldId)
+    {
+        return await repository.CreateSession(player1, player2, worldId);
+    }
 
+    //game world
+    [HttpPost]
+    [Route("createWorlds")]
+    public async Task<World[]> CreateWorlds()
+    {
+        return await repository.CreateWorlds();
+    }
+    [HttpGet]
+    [Route("getWorlds")]
+    public async Task<World[]> GetWorlds()
+    {
+        return await repository.GetWorlds();
+    }
     /*---------- ---------- ---------- ---------- ----------*/
 
     [HttpOptions]
