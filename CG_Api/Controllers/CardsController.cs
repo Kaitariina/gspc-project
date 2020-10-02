@@ -43,6 +43,18 @@ public class CardsController
 
     /*---------- ---------- ---------- ---------- ----------*/
 
+    [HttpGet]
+    [Route("getrarest/{playerId:Guid}")]
+    public Task<Card> GetRarestCard(Guid playerId)
+    {
+
+        return repository.GetRarestCard(playerId);
+    }
+
+
+
+    /*---------- ---------- ---------- ---------- ----------*/
+
     [HttpOptions]
     public void Options() { }
 

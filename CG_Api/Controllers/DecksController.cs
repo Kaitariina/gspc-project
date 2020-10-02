@@ -57,6 +57,30 @@ public class DecksController
 
     /*---------- ---------- ---------- ---------- ----------*/
 
+    // Postman: write only a single number in the body field
+    // 0 = MAGE, 1 = HUNTER, 2 = NINJA
+    [HttpGet]
+    [Route("getleastoftype")]
+    public Task<Deck> GetDeckWLeastOfClass(Guid playerId, [FromBody] CardClassType type)
+    {
+        return repository.GetDeckWLeastOfClass(playerId, type);
+    }
+
+    // Postman: write only a single number in the body field
+    // 0 = MAGE, 1 = HUNTER, 2 = NINJA
+    [HttpGet]
+    [Route("getmostoftype")]
+    public Task<Deck> GetDeckWMostOfClass(Guid playerId, [FromBody] CardClassType type)
+    {
+        return repository.GetDeckWMostOfClass(playerId, type);
+    }
+
+
+
+
+    /*---------- ---------- ---------- ---------- ----------*/
+
+
     [HttpOptions]
     public void Options() { }
 }

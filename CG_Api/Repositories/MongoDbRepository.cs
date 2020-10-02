@@ -150,6 +150,83 @@ class MongoDbRepository : IRepository
         throw new NotImplementedException();
     }
 
+
+    // More about decks
+    // 
+    public async Task<Deck> GetDeckWMostOfClass(Guid playerId, CardClassType type)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        var decks = player.DecksOwned;
+
+        Deck deck = null;
+        int current = 0;
+        int result = 0;
+
+        for (int i = 0; i < player.DecksOwned.Count; i++)
+        {
+            result = LoopDecksforType(decks[i], type);
+
+            if (result > current)
+            {
+                deck = decks[i];
+                current = result;
+            }
+        }
+        return deck;
+    }
+
+    public async Task<Deck> GetDeckWLeastOfClass(Guid playerId, CardClassType type)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        var decks = player.DecksOwned;
+
+        Deck deck = null;
+        int current = 0;
+        int result = 0;
+
+        for (int i = 0; i < player.DecksOwned.Count; i++)
+        {
+            result = LoopDecksforType(decks[i], type);
+
+            if (current == 0)
+            {
+                deck = decks[i];
+                current = result;
+            }
+
+            if (result < current)
+            {
+                deck = decks[i];
+                current = result;
+            }
+        }
+        return deck;
+    }
+
+    // Loop method used to count the amount of x cards in current deck
+    //
+    public int LoopDecksforType(Deck deck, CardClassType type)
+    {
+        int amount = 0;
+
+        for (int i = 0; i < deck.Cards_InDeck.Count; i++)
+        {
+            if (deck.Cards_InDeck[i].Class == type)
+            {
+                amount = amount + 1;
+            }
+        }
+        return amount;
+    }
+
+
+
+
+
     /*---------- ---------- ---------- ---------- ----------*/
 
     // Card related
@@ -226,6 +303,32 @@ class MongoDbRepository : IRepository
         }
         return null;
     }
+
+    // More about cards
+    //
+    public async Task<Card> GetRarestCard(Guid playerId)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        var decks = player.DecksOwned;
+        List<Card> cards = new List<Card>();
+
+        for (int i = 0; i < decks.Count; i++)
+        {
+            Deck deck = decks[i];
+
+            for (int j = 0; j < deck.Cards_InDeck.Count; j++)
+                cards.Add(deck.Cards_InDeck[j]);
+        }
+
+        var sortedCards = cards.OrderByDescending(c => c.Rarity);
+
+        return sortedCards.First();
+    }
+
+
+
 
     /*---------- ---------- ---------- ---------- ----------*/
     // game related
