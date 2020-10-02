@@ -327,7 +327,109 @@ class MongoDbRepository : IRepository
         return sortedCards.First();
     }
 
+    public async Task<Card> GetRarestTypeCard(Guid playerId, CardClassType type)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+        List<Card> cards = new List<Card>();
 
+        foreach (var deck in player.DecksOwned)
+        {
+            foreach (var card in deck.Cards_InDeck)
+            {
+                if (card.Class == type)
+                    cards.Add(card);
+            }
+        }
+        var sorted = cards.OrderByDescending(c => c.Rarity);
+        return sorted.First();
+    }
+
+    public async Task<Card> GetCardWHighestAtt(Guid playerId)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+        List<Card> cards = new List<Card>();
+
+        foreach (var deck in player.DecksOwned)
+        {
+            foreach (var card in deck.Cards_InDeck)
+            {
+                cards.Add(card);
+            }
+        }
+        var sorted = cards.OrderByDescending(c => c.Attack);
+        return sorted.First();
+    }
+
+    public async Task<Card> GetCardWHighestDef(Guid playerId)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+        List<Card> cards = new List<Card>();
+
+        foreach (var deck in player.DecksOwned)
+        {
+            foreach (var card in deck.Cards_InDeck)
+            {
+                cards.Add(card);
+            }
+        }
+        var sorted = cards.OrderByDescending(c => c.Defence);
+        return sorted.First();
+    }
+
+    public async Task<Card[]> GetAllTypeCards(Guid playerId, CardClassType type)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+        List<Card> cards = new List<Card>();
+
+        foreach (var deck in player.DecksOwned)
+        {
+            foreach (var card in deck.Cards_InDeck)
+            {
+                if (card.Class == type)
+                    cards.Add(card);
+            }
+        }
+        return cards.ToArray();
+    }
+
+    public async Task<CardClassType> GetMostCommonType(Guid playerId)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+        List<Card> mages = new List<Card>();
+        List<Card> hunters = new List<Card>();
+        List<Card> ninjas = new List<Card>();
+
+        foreach (var deck in player.DecksOwned)
+        {
+            foreach (var card in deck.Cards_InDeck)
+            {
+                if (card.Class == CardClassType.MAGE)
+                    mages.Add(card);
+                if (card.Class == CardClassType.HUNTER)
+                    hunters.Add(card);
+                if (card.Class == CardClassType.NINJA)
+                    ninjas.Add(card);
+            }
+        }
+
+
+        Console.WriteLine("mages: " + mages.Count + " hunters: " + hunters.Count + " ninjas: " + ninjas.Count);
+        if (mages.Count > hunters.Count && mages.Count > ninjas.Count)
+            return CardClassType.MAGE;
+        if (hunters.Count > mages.Count && hunters.Count > ninjas.Count)
+            return CardClassType.HUNTER;
+        if (ninjas.Count > mages.Count && ninjas.Count > hunters.Count)
+            return CardClassType.NINJA;
+        else
+        {
+            throw new DllNotFoundException();
+        }
+    }
 
 
     /*---------- ---------- ---------- ---------- ----------*/

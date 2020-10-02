@@ -30,6 +30,11 @@ public interface IRepository
     Task<Card> DeleteCard(Guid cardId);
 
     Task<Card> GetRarestCard(Guid playerId);
+    Task<Card> GetRarestTypeCard(Guid playerId, CardClassType type);
+    Task<CardClassType> GetMostCommonType(Guid playerId);
+    Task<Card> GetCardWHighestAtt(Guid playerId);
+    Task<Card> GetCardWHighestDef(Guid playerId);
+    Task<Card[]> GetAllTypeCards(Guid playerId, CardClassType type);
 
 
     // Sessions & Worlds

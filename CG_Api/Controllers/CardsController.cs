@@ -51,7 +51,40 @@ public class CardsController
         return repository.GetRarestCard(playerId);
     }
 
+    [HttpGet]
+    [Route("getallType/{playerId:Guid}")]
+    public Task<Card[]> GetAllTypeCards(Guid playerId, CardClassType type)
+    {
+        return repository.GetAllTypeCards(playerId, type);
+    }
 
+    [HttpGet]
+    [Route("getType/{playerId:Guid}")]
+    public Task<Card> GetRarestTypeCard(Guid playerId, CardClassType type)
+    {
+        return repository.GetRarestTypeCard(playerId, type);
+    }
+
+    [HttpGet]
+    [Route("getWAtt/{playerId:Guid}")]
+    public Task<Card> GetCardWHighestAtt(Guid playerId)
+    {
+        return repository.GetCardWHighestAtt(playerId);
+    }
+
+    [HttpGet]
+    [Route("getWDef/{playerId:Guid}")]
+    public Task<Card> GetCardWHighestDef(Guid playerId)
+    {
+        return repository.GetCardWHighestDef(playerId);
+    }
+
+    [HttpGet]
+    [Route("getCommon/{playerId:Guid}")]
+    public Task<CardClassType> GetMostCommonType(Guid playerId)
+    {
+        return repository.GetMostCommonType(playerId);
+    }
 
     /*---------- ---------- ---------- ---------- ----------*/
 
