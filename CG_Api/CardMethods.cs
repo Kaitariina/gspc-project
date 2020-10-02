@@ -37,7 +37,27 @@ public class CardMethods
 
         return adeck;
     }
+    public Card AddANewCard()
+    {
+        var card = new Card();
 
+        int raffle = rnd.Next(1, 4);
+
+        switch (raffle)
+        {
+            case 1:
+                card = CreateMageCard();
+                break;
+            case 2:
+                card = CreateHunterCard();
+                break;
+
+            case 3:
+                card = CreateNinjaCard();
+                break;
+        }
+        return card;
+    }
     // // Mage cards have the whole range available in attack and defence
     // // Rarity also varies from common to very rare
     public Card CreateMageCard()

@@ -28,10 +28,10 @@ public class DecksController
     }
 
     [HttpPost]
-    [Route("update/{deckId:Guid}")]
-    public Task<Deck> UpdateDeck(Guid deckId, Card card)
+    [Route("update/{deckId:Guid}/{cardId:Guid}")]
+    public Task<Deck> UpdateDeck(Guid deckId, Guid cardId)
     {
-        return repository.UpdateDeck(deckId, card);
+        return repository.UpdateDeck(deckId, cardId);
     }
 
     [HttpDelete]

@@ -17,7 +17,7 @@ public interface IRepository
     Task<Deck> DeleteDeck(Guid deckId, Guid playerId);
     Task<Deck> GetDeck(Guid playerId, Guid deckId);
     Task<Deck[]> GetDecks(Guid playerId);
-    Task<Deck> UpdateDeck(Guid deckId, Card card);
+    Task<Deck> UpdateDeck(Guid deckId, Guid cardId);
 
     Task<Deck> GetDeckWLeastOfClass(Guid playerId, CardClassType type);
     Task<Deck> GetDeckWMostOfClass(Guid playerId, CardClassType type);

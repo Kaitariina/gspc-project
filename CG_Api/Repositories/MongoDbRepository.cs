@@ -145,9 +145,39 @@ class MongoDbRepository : IRepository
         return player.DecksOwned.ToArray();
     }
 
-    public Task<Deck> UpdateDeck(Guid deckId, Card card)
+    public async Task<Deck> UpdateDeck(Guid deckId, Guid cardId)
     {
-        throw new NotImplementedException();
+        int j = 0;
+
+        FilterDefinition<Deck> deckFilter = Builders<Deck>.Filter.Eq(deck => deck.Id, deckId);
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.ElemMatch(player => player.DecksOwned, deckFilter);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        var cardCreation = new CardMethods();
+        Card newcard = cardCreation.AddANewCard();
+
+        for (int i = 0; i < player.DecksOwned.Count; i++)
+        {
+            foreach (var deck in player.DecksOwned)
+            {
+                if (deck.Id == deckId)
+                {
+                    foreach (var card in deck.Cards_InDeck)
+                    {
+                        if (card.Id == cardId)
+                        {
+                            player.DecksOwned[i].Cards_InDeck.RemoveAt(j);
+                            player.DecksOwned[i].Cards_InDeck.Add(newcard);
+
+                            player = await _playerCollection.FindOneAndReplaceAsync(playerFilter, player);
+                            return player.DecksOwned[i];
+                        }
+                        j++;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 
