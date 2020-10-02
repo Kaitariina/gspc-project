@@ -253,6 +253,206 @@ class MongoDbRepository : IRepository
         return amount;
     }
 
+    public async Task<Deck> GetDeckWMostAttackValue(Guid playerId)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        var decks = player.DecksOwned;
+
+        Deck deck = null;
+        int current = 0;
+
+        for (int i = 0; i < player.DecksOwned.Count; i++)
+        {
+            int result = LoopDecksforAttackValue(decks[i]);
+
+            if (result > current)
+            {
+                deck = decks[i];
+                current = result;
+            }
+        }
+
+        return deck;
+    }
+
+    public async Task<Deck> GetDeckWLeastAttackValue(Guid playerId)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        var decks = player.DecksOwned;
+
+        Deck deck = null;
+        int current = 0;
+
+        for (int i = 0; i < player.DecksOwned.Count; i++)
+        {
+            int result = LoopDecksforAttackValue(decks[i]);
+
+            if (current == 0)
+            {
+                deck = decks[i];
+                current = result;
+            }
+
+            if (result < current)
+            {
+                deck = decks[i];
+                current = result;
+            }
+        }
+
+        return deck;
+    }
+
+
+    public int LoopDecksforAttackValue(Deck deck)
+    {
+        int amount = 0;
+
+        for (int i = 0; i < deck.Cards_InDeck.Count; i++)
+        {
+            int add = deck.Cards_InDeck[i].Attack;
+            amount = amount + add;
+        }
+
+        return amount;
+    }
+
+    public async Task<Deck> GetDeckWMostDefenceValue(Guid playerId)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        var decks = player.DecksOwned;
+
+        Deck deck = null;
+        int current = 0;
+
+        for (int i = 0; i < player.DecksOwned.Count; i++)
+        {
+            int result = LoopDecksforDefenceValue(decks[i]);
+
+            if (result > current)
+            {
+                deck = decks[i];
+                current = result;
+            }
+        }
+
+        return deck;
+    }
+    public async Task<Deck> GetDeckWLeastDefenceValue(Guid playerId)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        var decks = player.DecksOwned;
+
+        Deck deck = null;
+        int current = 0;
+
+        for (int i = 0; i < player.DecksOwned.Count; i++)
+        {
+            int result = LoopDecksforDefenceValue(decks[i]);
+
+            if (current == 0)
+            {
+                deck = decks[i];
+                current = result;
+            }
+
+            if (result < current)
+            {
+                deck = decks[i];
+                current = result;
+            }
+
+        }
+
+        return deck;
+    }
+    public int LoopDecksforDefenceValue(Deck deck)
+    {
+        int amount = 0;
+
+        for (int i = 0; i < deck.Cards_InDeck.Count; i++)
+        {
+            int add = deck.Cards_InDeck[i].Defence;
+            amount = amount + add;
+        }
+
+        return amount;
+    }
+
+
+    public async Task<Deck> GetDeckWMostTauntCards(Guid playerId)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        var decks = player.DecksOwned;
+
+        Deck deck = null;
+        int current = 0;
+
+        for (int i = 0; i < player.DecksOwned.Count; i++)
+        {
+            int result = LoopDecksforTaunt(decks[i]);
+
+            if (result > current)
+            {
+                deck = decks[i];
+                current = result;
+            }
+        }
+
+        return deck;
+    }
+    public async Task<Deck> GetDeckWLeastTauntCards(Guid playerId)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        var decks = player.DecksOwned;
+
+        Deck deck = null;
+        int current = 0;
+
+        for (int i = 0; i < player.DecksOwned.Count; i++)
+        {
+            int result = LoopDecksforTaunt(decks[i]);
+
+            if (current == 0)
+            {
+                deck = decks[i];
+                current = result;
+            }
+
+            if (result < current)
+            {
+                deck = decks[i];
+                current = result;
+            }
+        }
+
+        return deck;
+    }
+    public int LoopDecksforTaunt(Deck deck)
+    {
+        int amount = 0;
+
+        for (int i = 0; i < deck.Cards_InDeck.Count; i++)
+        {
+            if (deck.Cards_InDeck[i].Taunt == true)
+            {
+                amount = amount + 1;
+            }
+        }
+        return amount;
+    }
 
 
 

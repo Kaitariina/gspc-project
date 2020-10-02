@@ -19,6 +19,14 @@ public interface IRepository
     Task<Deck[]> GetDecks(Guid playerId);
     Task<Deck> UpdateDeck(Guid deckId, Guid cardId);
 
+
+    Task<Deck> GetDeckWMostAttackValue(Guid playerId);
+    Task<Deck> GetDeckWLeastAttackValue(Guid playerId);
+    Task<Deck> GetDeckWMostDefenceValue(Guid playerId);
+    Task<Deck> GetDeckWLeastDefenceValue(Guid playerId);
+
+    Task<Deck> GetDeckWMostTauntCards(Guid playerId);
+    Task<Deck> GetDeckWLeastTauntCards(Guid playerId);
     Task<Deck> GetDeckWLeastOfClass(Guid playerId, CardClassType type);
     Task<Deck> GetDeckWMostOfClass(Guid playerId, CardClassType type);
 

@@ -76,7 +76,51 @@ public class DecksController
     }
 
 
+    [HttpGet]
+    [Route("getmostatk")]
+    public Task<Deck> GetDeckWMostAttackValue(Guid playerId)
+    {
+        return repository.GetDeckWMostAttackValue(playerId);
+    }
 
+    [HttpGet]
+    [Route("getleastatk")]
+    public Task<Deck> GetDeckWLeastAttackValue(Guid playerId)
+    {
+        return repository.GetDeckWLeastAttackValue(playerId);
+    }
+
+
+    [HttpGet]
+    [Route("getmostdef")]
+    public Task<Deck> GetDeckWMostDefencekValue(Guid playerId)
+    {
+        return repository.GetDeckWMostDefenceValue(playerId);
+    }
+
+    [HttpGet]
+    [Route("getleastdef")]
+    public Task<Deck> GetDeckWLeastDefenceValue(Guid playerId)
+    {
+        return repository.GetDeckWLeastDefenceValue(playerId);
+    }
+
+    [HttpGet]
+    [Route("getmosttaunts")]
+    public Task<Deck> GetDeckWMostTauntCards(Guid playerId)
+    {
+        return repository.GetDeckWMostTauntCards(playerId);
+
+    }
+
+
+    [HttpGet]
+    [Route("getleasttaunts")]
+    public Task<Deck> GetDeckWLeastTauntCards(Guid playerId)
+    {
+        return repository.GetDeckWLeastTauntCards(playerId);
+
+    }
 
     /*---------- ---------- ---------- ---------- ----------*/
 
