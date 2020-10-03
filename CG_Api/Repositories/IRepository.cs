@@ -10,6 +10,8 @@ public interface IRepository
     Task<Player> Create(Player player);
     Task<Player> Delete(Guid id);
 
+    Task<Player> PlayerWHighestRarityCard();
+    Task<Player> PlayerWHighestRank();
 
     // Decks
     //

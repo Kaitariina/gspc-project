@@ -65,6 +65,22 @@ public class PlayersController
 
         return await repository.Delete(id);
     }
+
+    [HttpGet]
+    [Route("getwithrarecard")]
+    public async Task<Player> PlayerWHighestRarityCard()
+    {
+        return await repository.PlayerWHighestRarityCard();
+    }
+
+    [HttpGet]
+    [Route("getwithbestrank")]
+    public async Task<Player> PlayerWHighestRank()
+    {
+        return await repository.PlayerWHighestRank();
+    }
+
+
     //game session
     [HttpPost]
     [Route("createSession/{player1:Guid}/{player2:Guid}/{worldId:Guid}")]

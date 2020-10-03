@@ -61,6 +61,40 @@ class MongoDbRepository : IRepository
         return await _playerCollection.FindOneAndDeleteAsync(filter);
     }
 
+
+    public async Task<Player> PlayerWHighestRarityCard()
+    {
+        Player player = null;
+
+        var playersWithRareCards = Builders<Player>.Filter.ElemMatch<Deck>(p => p.DecksOwned, Builders<Deck>
+                                    .Filter.ElemMatch(d => d.Cards_InDeck, Builders<Card>.Filter.Eq("Rarity", 5)));
+
+        var players = await _playerCollection.Find(playersWithRareCards).ToListAsync();
+
+        if (players.Count == 0)
+        {
+            playersWithRareCards = Builders<Player>.Filter.ElemMatch<Deck>(p => p.DecksOwned, Builders<Deck>
+                            .Filter.ElemMatch(d => d.Cards_InDeck, Builders<Card>.Filter.Eq("Rarity", 4)));
+
+            players = await _playerCollection.Find(playersWithRareCards).ToListAsync();
+        }
+
+        player = players.First();
+
+        return player;
+
+    }
+
+    public async Task<Player> PlayerWHighestRank()
+    {
+        var players = await _playerCollection.Find(new BsonDocument()).ToListAsync();
+        players.OrderByDescending(p => p.Rank);
+
+        return players.First();
+    }
+
+
+
     /*---------- ---------- ---------- ---------- ----------*/
 
     // Deck related
