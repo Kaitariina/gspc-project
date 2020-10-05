@@ -681,7 +681,6 @@ class MongoDbRepository : IRepository
             }
         }
 
-
         Console.WriteLine("mages: " + mages.Count + " hunters: " + hunters.Count + " ninjas: " + ninjas.Count);
         if (mages.Count > hunters.Count && mages.Count > ninjas.Count)
             return CardClassType.MAGE;
@@ -709,11 +708,11 @@ class MongoDbRepository : IRepository
         FilterDefinition<World> filter = Builders<World>.Filter.Eq(world => world.Id, worldId);
         World sessionWorld = await _worldCollection.Find(filter).FirstAsync();
 
+        Random rnd = new Random();
         var newSession = new GameSession()
         {
             Id = Guid.NewGuid(),
-            //muuta ajat loogisemmiksi
-            Time_Started = DateTime.Now,
+            Time_Started = DateTime.Now.AddMinutes(rnd.Next(2, 25) * -1),
             Time_Finished = DateTime.Now,
             World = sessionWorld,
         };
@@ -732,6 +731,71 @@ class MongoDbRepository : IRepository
         sessionWorld = await _worldCollection.FindOneAndUpdateAsync(filter, updateSession);
 
         return newSession;
+    }
+
+    public async Task<GameSession[]> GetSessions()
+    {
+        List<Player> players = await _playerCollection.Find(new BsonDocument()).ToListAsync();
+        List<GameSession> sessions = new List<GameSession>();
+        bool duplicate = false;
+
+        foreach (var player in players)
+        {
+            foreach (var session in player.Sessions)
+            {
+                //lisää sessiot listaan vain kerran (yksi sessio aina kahdella pelaajalla -> kerta listaan riittää)
+                duplicate = false;
+                for (int i = 0; i < sessions.Count; i++)
+                {
+                    if (session.Id == sessions[i].Id)
+                    {
+                        duplicate = true;
+                        Console.WriteLine("duplicate session");
+                    }
+                }
+                if (!duplicate)
+                    sessions.Add(session);
+            }
+        }
+        return sessions.ToArray();
+    }
+
+    public async Task<GameSession> GetLongestSession()
+    {
+        GameSession[] sessions = await GetSessions();
+        TimeSpan time;
+        TimeSpan longest = new TimeSpan();
+        GameSession session = new GameSession();
+
+        foreach (var s in sessions)
+        {
+            time = s.Time_Finished.Subtract(s.Time_Started);
+            if (time > longest)
+            {
+                longest = time;
+                session = s;
+            }
+        }
+        return session;
+    }
+    public async Task<GameSession> GetShortestSession()
+    {
+        GameSession[] sessions = await GetSessions();
+        TimeSpan time;
+        //session pituus 2-24min -> 25min aina suurempi
+        TimeSpan longest = DateTime.Now.AddMinutes(25).Subtract(DateTime.Now);
+        GameSession session = new GameSession();
+
+        foreach (var s in sessions)
+        {
+            time = s.Time_Finished.Subtract(s.Time_Started);
+            if (time < longest)
+            {
+                longest = time;
+                session = s;
+            }
+        }
+        return session;
     }
 
     public async Task<World[]> CreateWorlds()
@@ -757,5 +821,39 @@ class MongoDbRepository : IRepository
     {
         var worlds = await _worldCollection.Find(new BsonDocument()).ToListAsync();
         return worlds.ToArray();
+    }
+
+    public async Task<World> GetMostPlayed()
+    {
+        FilterDefinition<World> filter = Builders<World>.Filter.Empty;
+        SortDefinition<World> sort = Builders<World>.Sort.Descending(world => world.SessionCount);
+        List<World> sorted = await _worldCollection.Find(filter).Sort(sort).ToListAsync();
+
+        return sorted.First();
+
+        // return await (Task<WorldCount>)_worldCollection
+        //     .Aggregate()
+        //     .Project(world => world.SessionCount)
+        //     .Group(sessions => sessions, world => new WorldCount { Id = world.Key, Count = world.Sum() })
+        //     .SortByDescending(session => session.Count)
+        //     .Limit(1);
+    }
+
+    public async Task<World> GetLeastPlayed()
+    {
+        FilterDefinition<World> filter = Builders<World>.Filter.Empty;
+        SortDefinition<World> sort = Builders<World>.Sort.Ascending(world => world.SessionCount);
+        List<World> sorted = await _worldCollection.Find(filter).Sort(sort).ToListAsync();
+
+        return sorted.First();
+    }
+
+    public async Task<World> GetMostDifficult()
+    {
+        FilterDefinition<World> filter = Builders<World>.Filter.Empty;
+        SortDefinition<World> sort = Builders<World>.Sort.Descending(world => world.Difficulty);
+        List<World> sorted = await _worldCollection.Find(filter).Sort(sort).ToListAsync();
+
+        return sorted.First();
     }
 }
