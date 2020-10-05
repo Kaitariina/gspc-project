@@ -12,6 +12,9 @@ public interface IRepository
 
     Task<Player> PlayerWHighestRarityCard();
     Task<Player> PlayerWHighestRank();
+    Task<Player> GetPlayerWMostGames();
+    Task<Player> UpdateRank(Guid playerId);
+
 
     // Decks
     //

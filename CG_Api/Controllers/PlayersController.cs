@@ -26,6 +26,9 @@ public class PlayersController
     {
         Random rnd = new Random();
         List<Deck> decks = new List<Deck>();
+        decks.Add(await repository.CreateDeck(player.Id));
+
+        List<GameSession> sessions = new List<GameSession>();
 
         player = new Player()
         {
@@ -34,7 +37,8 @@ public class PlayersController
             IsBanned = false,
             CreationTime = DateTime.UtcNow,
             DecksOwned = decks,
-            Rank = Rank.AMATEUR
+            Rank = Rank.AMATEUR,
+            Sessions = sessions
         };
 
         logger.LogInformation("Player created: " + player.Name);
@@ -57,6 +61,7 @@ public class PlayersController
     {
         return repository.GetAll();
     }
+
     [HttpDelete]
     [Route("{id:Guid}")]
     public async Task<Player> Delete(Guid id)
@@ -79,6 +84,21 @@ public class PlayersController
     {
         return await repository.PlayerWHighestRank();
     }
+
+    [HttpGet]
+    [Route("getwithmostgames")]
+    public async Task<Player> GetPlayerWMostGames()
+    {
+        return await repository.GetPlayerWMostGames();
+    }
+
+    [HttpPost]
+    [Route("{id:Guid}/updaterank")]
+    public async Task<Player> UpdateRank(Guid id)
+    {
+        return await repository.UpdateRank(id);
+    }
+
 
     /*---------- ---------- ---------- ---------- ----------*/
 

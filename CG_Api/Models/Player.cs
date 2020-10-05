@@ -17,7 +17,9 @@ public class Player
     public string Name { get; set; }
     public bool IsBanned { get; set; }
     public DateTime CreationTime { get; set; }
-    public List<Deck> DecksOwned { get; set; }
     public Rank Rank { get; set; }
+
+    //[DeckValidation]
+    public List<Deck> DecksOwned { get; set; }
     public List<GameSession> Sessions { get; set; }
 }

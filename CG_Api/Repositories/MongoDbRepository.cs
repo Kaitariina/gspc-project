@@ -94,6 +94,42 @@ class MongoDbRepository : IRepository
     }
 
 
+    public async Task<Player> UpdateRank(Guid playerId)
+    {
+        Rank newRank = Rank.NOVICE;
+
+        FilterDefinition<Player> filter = Builders<Player>.Filter.Eq(p => p.Id, playerId);
+        Player player = await _playerCollection.Find(filter).FirstAsync();
+
+        if (player.Rank == Rank.NOVICE)
+        {
+            newRank = Rank.AMATEUR;
+        }
+        else if (player.Rank == Rank.AMATEUR)
+        {
+            newRank = Rank.PROFESSIONAL;
+        }
+        else
+        {
+            newRank = Rank.PROFESSIONAL;
+        }
+
+        var rankUpdate = Builders<Player>.Update.Set(p => p.Rank, newRank);
+
+        return await _playerCollection.FindOneAndUpdateAsync(filter, rankUpdate);
+    }
+
+
+    public async Task<Player> GetPlayerWMostGames()
+    {
+
+        // TO DO
+
+        return null;
+
+    }
+
+
 
     /*---------- ---------- ---------- ---------- ----------*/
 
@@ -113,18 +149,8 @@ class MongoDbRepository : IRepository
         {
             ReturnDocument = ReturnDocument.After
         };
+
         Player player = await _playerCollection.FindOneAndUpdateAsync(filter, pushDeck, options);
-
-        //en saanu tätä toimimaan? heitti "sequence has no elements" erroria
-        // Player player = await Get(playerId);
-
-        // var deckCreation = new CardMethods();
-        // var deck = deckCreation.CreateADeck();
-
-        // player.DecksOwned.Add(deck);
-
-        // var filter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
-        // await _playerCollection.ReplaceOneAsync(filter, player);
 
         return deck;
     }
@@ -137,14 +163,21 @@ class MongoDbRepository : IRepository
         FilterDefinition<Player> playerFilter = Builders<Player>.Filter.ElemMatch(player => player.DecksOwned, deckFilter);
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
 
-        for (int i = 0; i < player.DecksOwned.Count; i++)
+        if (player == null)
         {
-            if (player.DecksOwned[i].Id == deckId)
+            throw new NotFoundException("Player not found.");
+        }
+        else
+        {
+            for (int i = 0; i < player.DecksOwned.Count; i++)
             {
-                deletedDeck = player.DecksOwned[i];
+                if (player.DecksOwned[i].Id == deckId)
+                {
+                    deletedDeck = player.DecksOwned[i];
 
-                player.DecksOwned.RemoveAt(i);
-                await _playerCollection.ReplaceOneAsync(playerFilter, player);
+                    player.DecksOwned.RemoveAt(i);
+                    await _playerCollection.ReplaceOneAsync(playerFilter, player);
+                }
             }
         }
 
