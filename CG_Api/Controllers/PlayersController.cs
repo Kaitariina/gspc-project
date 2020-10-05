@@ -99,6 +99,19 @@ public class PlayersController
         return await repository.UpdateRank(id);
     }
 
+    [HttpPost]
+    [Route("{id:Guid}/ban")]
+    public async Task<Player> BanPlayer(Guid id)
+    {
+        return await repository.BanPlayer(id);
+    }
+
+    [HttpPost]
+    [Route("{id:Guid}/unban")]
+    public async Task<Player> UnBanPlayer(Guid id)
+    {
+        return await repository.UnBanPlayer(id);
+    }
 
     /*---------- ---------- ---------- ---------- ----------*/
 

@@ -14,6 +14,8 @@ public interface IRepository
     Task<Player> PlayerWHighestRank();
     Task<Player> GetPlayerWMostGames();
     Task<Player> UpdateRank(Guid playerId);
+    Task<Player> BanPlayer(Guid playerId);
+    Task<Player> UnBanPlayer(Guid playerId);
 
 
     // Decks

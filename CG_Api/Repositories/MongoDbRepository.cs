@@ -119,14 +119,29 @@ class MongoDbRepository : IRepository
         return await _playerCollection.FindOneAndUpdateAsync(filter, rankUpdate);
     }
 
+    public async Task<Player> BanPlayer(Guid playerId)
+    {
+        FilterDefinition<Player> filter = Builders<Player>.Filter.Eq(p => p.Id, playerId);
+        Player player = await _playerCollection.Find(filter).FirstAsync();
+
+        var ban = Builders<Player>.Update.Set(p => p.IsBanned, true);
+
+        return await _playerCollection.FindOneAndUpdateAsync(filter, ban);
+    }
+
+    public async Task<Player> UnBanPlayer(Guid playerId)
+    {
+        FilterDefinition<Player> filter = Builders<Player>.Filter.Eq(p => p.Id, playerId);
+        Player player = await _playerCollection.Find(filter).FirstAsync();
+
+        var ban = Builders<Player>.Update.Set(p => p.IsBanned, false);
+
+        return await _playerCollection.FindOneAndUpdateAsync(filter, ban);
+    }
 
     public async Task<Player> GetPlayerWMostGames()
     {
-
-        // TO DO
-
         return null;
-
     }
 
 
