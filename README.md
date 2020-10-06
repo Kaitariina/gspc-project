@@ -1,1 +1,1 @@
-# gspc-projectproto
+# gspc-project
