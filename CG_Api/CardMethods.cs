@@ -1,10 +1,6 @@
 
 using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-
 
 public class CardMethods
 {
@@ -34,7 +30,6 @@ public class CardMethods
                     break;
             }
         }
-
         return adeck;
     }
     public Card AddANewCard()

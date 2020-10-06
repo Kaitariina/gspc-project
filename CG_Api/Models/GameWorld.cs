@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 public enum Theme
@@ -16,6 +15,8 @@ public class World
 
     [Range(0, 5)]
     public int Difficulty { get; set; }
+
+    [EnumDataType(typeof(Theme))]
     public Theme Theme { get; set; }
     public int SessionCount { get; set; }
 }

@@ -2,21 +2,16 @@ using System;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Linq.Expressions;
 using System.Collections.Generic;
-
 using MongoDB.Bson;
 using MongoDB.Driver;
-
 
 class MongoDbRepository : IRepository
 {
     private readonly IMongoCollection<Player> _playerCollection;
     private readonly IMongoCollection<World> _worldCollection;
-    //private readonly IMongoCollection<Card> _cardCollection;
     private readonly IMongoCollection<BsonDocument> _bsonDocumentCollection;
     private readonly IMongoCollection<BsonDocument> _bsonDocumentCollectionw;
-    //private readonly IMongoCollection<BsonDocument> _bsonDocumentCollection2;
 
 
     public MongoDbRepository()
@@ -25,11 +20,9 @@ class MongoDbRepository : IRepository
         var database = mongoClient.GetDatabase("cardgame");
         _playerCollection = database.GetCollection<Player>("players");
         _worldCollection = database.GetCollection<World>("worlds");
-        //_cardCollection = database.GetCollection<Card>("cards");
 
         _bsonDocumentCollection = database.GetCollection<BsonDocument>("players");
         _bsonDocumentCollectionw = database.GetCollection<BsonDocument>("worlds");
-        //_bsonDocumentCollection2 = database.GetCollection<BsonDocument>("cards");
     }
 
     /*---------- ---------- ---------- ---------- ----------*/
@@ -113,7 +106,6 @@ class MongoDbRepository : IRepository
         {
             newRank = Rank.PROFESSIONAL;
         }
-
         var rankUpdate = Builders<Player>.Update.Set(p => p.Rank, newRank);
 
         return await _playerCollection.FindOneAndUpdateAsync(filter, rankUpdate);
@@ -141,7 +133,11 @@ class MongoDbRepository : IRepository
 
     public async Task<Player> GetPlayerWMostGames()
     {
-        return null;
+        FilterDefinition<Player> filter = Builders<Player>.Filter.Empty;
+        SortDefinition<Player> sort = Builders<Player>.Sort.Descending(player => player.Sessions);
+        List<Player> sorted = await _playerCollection.Find(filter).Sort(sort).ToListAsync();
+
+        return sorted.First();
     }
 
 
@@ -180,7 +176,7 @@ class MongoDbRepository : IRepository
 
         if (player == null)
         {
-            throw new NotFoundException("Player not found.");
+            throw new NotFoundException();
         }
         else
         {
@@ -195,7 +191,6 @@ class MongoDbRepository : IRepository
                 }
             }
         }
-
         return deletedDeck;
     }
 
@@ -206,6 +201,8 @@ class MongoDbRepository : IRepository
         var playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
 
+        if (player == null)
+            throw new NotFoundException();
 
         if (player.DecksOwned.Count > 0)
         {
@@ -217,7 +214,6 @@ class MongoDbRepository : IRepository
                 }
             }
         }
-
         return thisDeck;
     }
 
@@ -234,6 +230,9 @@ class MongoDbRepository : IRepository
         FilterDefinition<Deck> deckFilter = Builders<Deck>.Filter.Eq(deck => deck.Id, deckId);
         FilterDefinition<Player> playerFilter = Builders<Player>.Filter.ElemMatch(player => player.DecksOwned, deckFilter);
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        if (player == null)
+            throw new NotFoundException();
 
         var cardCreation = new CardMethods();
         Card newcard = cardCreation.AddANewCard();
@@ -270,6 +269,9 @@ class MongoDbRepository : IRepository
         FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
 
+        if (player == null)
+            throw new NotFoundException();
+
         var decks = player.DecksOwned;
 
         Deck deck = null;
@@ -293,6 +295,9 @@ class MongoDbRepository : IRepository
     {
         FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        if (player == null)
+            throw new NotFoundException();
 
         var decks = player.DecksOwned;
 
@@ -341,7 +346,6 @@ class MongoDbRepository : IRepository
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
 
         var decks = player.DecksOwned;
-
         Deck deck = null;
         int current = 0;
 
@@ -355,7 +359,6 @@ class MongoDbRepository : IRepository
                 current = result;
             }
         }
-
         return deck;
     }
 
@@ -365,7 +368,6 @@ class MongoDbRepository : IRepository
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
 
         var decks = player.DecksOwned;
-
         Deck deck = null;
         int current = 0;
 
@@ -385,7 +387,6 @@ class MongoDbRepository : IRepository
                 current = result;
             }
         }
-
         return deck;
     }
 
@@ -399,7 +400,6 @@ class MongoDbRepository : IRepository
             int add = deck.Cards_InDeck[i].Attack;
             amount = amount + add;
         }
-
         return amount;
     }
 
@@ -409,7 +409,6 @@ class MongoDbRepository : IRepository
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
 
         var decks = player.DecksOwned;
-
         Deck deck = null;
         int current = 0;
 
@@ -423,7 +422,6 @@ class MongoDbRepository : IRepository
                 current = result;
             }
         }
-
         return deck;
     }
     public async Task<Deck> GetDeckWLeastDefenceValue(Guid playerId)
@@ -432,7 +430,6 @@ class MongoDbRepository : IRepository
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
 
         var decks = player.DecksOwned;
-
         Deck deck = null;
         int current = 0;
 
@@ -451,9 +448,7 @@ class MongoDbRepository : IRepository
                 deck = decks[i];
                 current = result;
             }
-
         }
-
         return deck;
     }
     public int LoopDecksforDefenceValue(Deck deck)
@@ -465,7 +460,6 @@ class MongoDbRepository : IRepository
             int add = deck.Cards_InDeck[i].Defence;
             amount = amount + add;
         }
-
         return amount;
     }
 
@@ -476,7 +470,6 @@ class MongoDbRepository : IRepository
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
 
         var decks = player.DecksOwned;
-
         Deck deck = null;
         int current = 0;
 
@@ -490,7 +483,6 @@ class MongoDbRepository : IRepository
                 current = result;
             }
         }
-
         return deck;
     }
     public async Task<Deck> GetDeckWLeastTauntCards(Guid playerId)
@@ -499,7 +491,6 @@ class MongoDbRepository : IRepository
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
 
         var decks = player.DecksOwned;
-
         Deck deck = null;
         int current = 0;
 
@@ -519,7 +510,6 @@ class MongoDbRepository : IRepository
                 current = result;
             }
         }
-
         return deck;
     }
     public int LoopDecksforTaunt(Deck deck)
@@ -536,8 +526,27 @@ class MongoDbRepository : IRepository
         return amount;
     }
 
+    public async Task<Deck> GetDeckWCard(Guid cardId)
+    {
+        FilterDefinition<Card> cardFilter = Builders<Card>.Filter.Eq(card => card.Id, cardId);
+        FilterDefinition<Deck> deckFilter = Builders<Deck>.Filter.ElemMatch(deck => deck.Cards_InDeck, cardFilter);
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.ElemMatch(player => player.DecksOwned, deckFilter);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
 
-
+        Deck deck;
+        foreach (var d in player.DecksOwned)
+        {
+            foreach (var c in d.Cards_InDeck)
+            {
+                if (c.Id == cardId)
+                {
+                    deck = d;
+                    return deck;
+                }
+            }
+        }
+        return null;
+    }
 
     /*---------- ---------- ---------- ---------- ----------*/
 
@@ -548,6 +557,9 @@ class MongoDbRepository : IRepository
     {
         FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        if (player == null)
+            throw new NotFoundException();
 
         for (int i = 0; i < player.DecksOwned.Count; i++)
         {
@@ -570,48 +582,13 @@ class MongoDbRepository : IRepository
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
         List<Card> cardList = new List<Card>();
 
-        for (int i = 0; i < player.DecksOwned.Count; i++)
+        foreach (var deck in player.DecksOwned)
         {
-            foreach (var deck in player.DecksOwned)
+            foreach (var card in deck.Cards_InDeck)
             {
-                if (deck.Cards_InDeck.Count > 0)
-                {
-                    foreach (var card in deck.Cards_InDeck)
-                    {
-                        cardList.Add(card);
-                    }
-                    return cardList.ToArray();
-                }
+                cardList.Add(card);
             }
-        }
-        return null;
-    }
-    public async Task<Card> DeleteCard(Guid cardId)
-    {
-        FilterDefinition<Card> filter = Builders<Card>.Filter.Eq(card => card.Id, cardId);
-        FilterDefinition<Deck> deckFilter = Builders<Deck>.Filter.ElemMatch(deck => deck.Cards_InDeck, filter);
-        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.ElemMatch(player => player.DecksOwned, deckFilter);
-        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
-        int x = 0;
-
-        for (int i = 0; i < player.DecksOwned.Count; i++)
-        {
-            foreach (var deck in player.DecksOwned)
-            {
-                if (deck.Cards_InDeck.Count > 0)
-                {
-                    foreach (var card in deck.Cards_InDeck)
-                    {
-                        if (card.Id == cardId)
-                        {
-                            deck.Cards_InDeck.RemoveAt(x);
-                            await _playerCollection.ReplaceOneAsync(playerFilter, player);
-                            return card;
-                        }
-                        x++;
-                    }
-                }
-            }
+            return cardList.ToArray();
         }
         return null;
     }
@@ -633,7 +610,6 @@ class MongoDbRepository : IRepository
             for (int j = 0; j < deck.Cards_InDeck.Count; j++)
                 cards.Add(deck.Cards_InDeck[j]);
         }
-
         var sortedCards = cards.OrderByDescending(c => c.Rarity);
 
         return sortedCards.First();
@@ -643,6 +619,10 @@ class MongoDbRepository : IRepository
     {
         FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        if (player == null)
+            throw new NotFoundException();
+
         List<Card> cards = new List<Card>();
 
         foreach (var deck in player.DecksOwned)
@@ -666,12 +646,24 @@ class MongoDbRepository : IRepository
         foreach (var deck in player.DecksOwned)
         {
             foreach (var card in deck.Cards_InDeck)
-            {
                 cards.Add(card);
-            }
         }
         var sorted = cards.OrderByDescending(c => c.Attack);
         return sorted.First();
+    }
+    public async Task<Card> GetCardWLowestAtt(Guid playerId)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+        List<Card> cards = new List<Card>();
+
+        foreach (var deck in player.DecksOwned)
+        {
+            foreach (var card in deck.Cards_InDeck)
+                cards.Add(card);
+        }
+        var sorted = cards.OrderByDescending(c => c.Attack);
+        return sorted.Last();
     }
 
     public async Task<Card> GetCardWHighestDef(Guid playerId)
@@ -683,18 +675,35 @@ class MongoDbRepository : IRepository
         foreach (var deck in player.DecksOwned)
         {
             foreach (var card in deck.Cards_InDeck)
-            {
                 cards.Add(card);
-            }
         }
         var sorted = cards.OrderByDescending(c => c.Defence);
         return sorted.First();
+    }
+
+    public async Task<Card> GetCardWLowestDef(Guid playerId)
+    {
+        FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
+        Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+        List<Card> cards = new List<Card>();
+
+        foreach (var deck in player.DecksOwned)
+        {
+            foreach (var card in deck.Cards_InDeck)
+                cards.Add(card);
+        }
+        var sorted = cards.OrderByDescending(c => c.Defence);
+        return sorted.Last();
     }
 
     public async Task<Card[]> GetAllTypeCards(Guid playerId, CardClassType type)
     {
         FilterDefinition<Player> playerFilter = Builders<Player>.Filter.Eq(player => player.Id, playerId);
         Player player = await _playerCollection.Find(playerFilter).FirstAsync();
+
+        if (player == null)
+            throw new NotFoundException();
+
         List<Card> cards = new List<Card>();
 
         foreach (var deck in player.DecksOwned)
@@ -728,8 +737,6 @@ class MongoDbRepository : IRepository
                     ninjas.Add(card);
             }
         }
-
-        Console.WriteLine("mages: " + mages.Count + " hunters: " + hunters.Count + " ninjas: " + ninjas.Count);
         if (mages.Count > hunters.Count && mages.Count > ninjas.Count)
             return CardClassType.MAGE;
         if (hunters.Count > mages.Count && hunters.Count > ninjas.Count)
@@ -737,48 +744,52 @@ class MongoDbRepository : IRepository
         if (ninjas.Count > mages.Count && ninjas.Count > hunters.Count)
             return CardClassType.NINJA;
         else
-        {
-            throw new DllNotFoundException();
-        }
+            throw new NotFoundException();
     }
 
 
     /*---------- ---------- ---------- ---------- ----------*/
     // game related
-    // create session, worlds and get worlds
-    public async Task<GameSession> CreateSession(Guid player1, Guid player2, Guid worldId)
+    // create & get sessions
+    public async Task<GameSession> CreateSession(Guid player1, Guid player2, World world)
     {
+        Random rnd = new Random();
+
         FilterDefinition<Player> filter1 = Builders<Player>.Filter.Eq(player => player.Id, player1);
         FilterDefinition<Player> filter2 = Builders<Player>.Filter.Eq(player => player.Id, player2);
         Player playerOne = await _playerCollection.Find(filter1).FirstAsync();
         Player playerTwo = await _playerCollection.Find(filter2).FirstAsync();
 
-        FilterDefinition<World> filter = Builders<World>.Filter.Eq(world => world.Id, worldId);
-        World sessionWorld = await _worldCollection.Find(filter).FirstAsync();
+        if (playerOne == null || playerTwo == null)
+            throw new NotFoundException();
+        if (playerOne.IsBanned || playerTwo.IsBanned)
+            throw new PlayerBannedException();
 
-        Random rnd = new Random();
-        var newSession = new GameSession()
+        FilterDefinition<World> filter = Builders<World>.Filter.Eq(world => world.Theme, world.Theme);
+        world = await _worldCollection.Find(filter).FirstAsync();
+        UpdateDefinition<World> updateSession = Builders<World>.Update.Inc(world => world.SessionCount, 1);
+
+        var session = new GameSession()
         {
             Id = Guid.NewGuid(),
-            Time_Started = DateTime.Now.AddMinutes(rnd.Next(2, 25) * -1),
-            Time_Finished = DateTime.Now,
-            World = sessionWorld,
+            Time_Started = DateTime.UtcNow.AddMinutes(rnd.Next(2, 25) * -1),
+            Time_Finished = DateTime.UtcNow,
+            World = world
         };
+
         if (playerOne.Sessions == null)
             playerOne.Sessions = new List<GameSession>();
         if (playerTwo.Sessions == null)
             playerTwo.Sessions = new List<GameSession>();
 
-        playerOne.Sessions.Add(newSession);
-        playerTwo.Sessions.Add(newSession);
-
-        UpdateDefinition<World> updateSession = Builders<World>.Update.Inc(world => world.SessionCount, 1);
+        playerOne.Sessions.Add(session);
+        playerTwo.Sessions.Add(session);
 
         await _playerCollection.ReplaceOneAsync(filter1, playerOne);
         await _playerCollection.ReplaceOneAsync(filter2, playerTwo);
-        sessionWorld = await _worldCollection.FindOneAndUpdateAsync(filter, updateSession);
+        world = await _worldCollection.FindOneAndUpdateAsync(filter, updateSession);
 
-        return newSession;
+        return session;
     }
 
     public async Task<GameSession[]> GetSessions()
@@ -796,10 +807,7 @@ class MongoDbRepository : IRepository
                 for (int i = 0; i < sessions.Count; i++)
                 {
                     if (session.Id == sessions[i].Id)
-                    {
                         duplicate = true;
-                        Console.WriteLine("duplicate session");
-                    }
                 }
                 if (!duplicate)
                     sessions.Add(session);
@@ -846,6 +854,9 @@ class MongoDbRepository : IRepository
         return session;
     }
 
+    /*---------- ---------- ---------- ---------- ----------*/
+    // game related
+    // create & get worlds
     public async Task<World[]> CreateWorlds()
     {
         List<World> list = new List<World>();
@@ -878,13 +889,6 @@ class MongoDbRepository : IRepository
         List<World> sorted = await _worldCollection.Find(filter).Sort(sort).ToListAsync();
 
         return sorted.First();
-
-        // return await (Task<WorldCount>)_worldCollection
-        //     .Aggregate()
-        //     .Project(world => world.SessionCount)
-        //     .Group(sessions => sessions, world => new WorldCount { Id = world.Key, Count = world.Sum() })
-        //     .SortByDescending(session => session.Count)
-        //     .Limit(1);
     }
 
     public async Task<World> GetLeastPlayed()

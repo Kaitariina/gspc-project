@@ -34,25 +34,27 @@ public interface IRepository
     Task<Deck> GetDeckWLeastTauntCards(Guid playerId);
     Task<Deck> GetDeckWLeastOfClass(Guid playerId, CardClassType type);
     Task<Deck> GetDeckWMostOfClass(Guid playerId, CardClassType type);
+    Task<Deck> GetDeckWCard(Guid cardId);
 
 
     // Cards
     //
     Task<Card> GetCard(Guid playerId, Guid cardId);
     Task<Card[]> GetAllCardsInDeck(Guid deckId);
-    Task<Card> DeleteCard(Guid cardId);
 
     Task<Card> GetRarestCard(Guid playerId);
     Task<Card> GetRarestTypeCard(Guid playerId, CardClassType type);
     Task<CardClassType> GetMostCommonType(Guid playerId);
     Task<Card> GetCardWHighestAtt(Guid playerId);
+    Task<Card> GetCardWLowestAtt(Guid playerId);
     Task<Card> GetCardWHighestDef(Guid playerId);
+    Task<Card> GetCardWLowestDef(Guid playerId);
     Task<Card[]> GetAllTypeCards(Guid playerId, CardClassType type);
 
 
     // Sessions & Worlds
     //
-    Task<GameSession> CreateSession(Guid player1, Guid player2, Guid worldId);
+    Task<GameSession> CreateSession(Guid player1, Guid player2, World world);
 
     public Task<GameSession> GetLongestSession();
     public Task<GameSession> GetShortestSession();

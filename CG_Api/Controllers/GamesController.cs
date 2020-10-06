@@ -22,10 +22,23 @@ public class GamesController
 
     //game session
     [HttpPost]
-    [Route("createSession/{player1:Guid}/{player2:Guid}/{worldId:Guid}")]
-    public async Task<GameSession> CreateSession(Guid player1, Guid player2, Guid worldId)
+    [Route("createSession/{player1:Guid}/{player2:Guid}")]
+    public async Task<GameSession> CreateSession(Guid player1, Guid player2, World world)
     {
-        return await repository.CreateSession(player1, player2, worldId);
+        Random rnd = new Random();
+        World[] array = await repository.GetWorlds();
+        List<World> worlds = new List<World>();
+        foreach (var i in array)
+        {
+            worlds.Add(i);
+        }
+
+        if (worlds.Count == 0)
+            world = null;
+        else
+            world = worlds[rnd.Next(0, 4)];
+
+        return await repository.CreateSession(player1, player2, world);
     }
 
     [HttpGet]
@@ -48,6 +61,8 @@ public class GamesController
     {
         return await repository.GetShortestSession();
     }
+
+    /*---------- ---------- ---------- ---------- ----------*/
 
     //game world
     [HttpPost]

@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 
 
 [ApiController]
@@ -53,6 +52,13 @@ public class DecksController
     public Task<Deck[]> GetDecks(Guid playerId)
     {
         return repository.GetDecks(playerId);
+    }
+
+    [HttpGet]
+    [Route("getWCard/{cardId:Guid}")]
+    public Task<Deck> GetDeckWCard(Guid cardId)
+    {
+        return repository.GetDeckWCard(cardId);
     }
 
     /*---------- ---------- ---------- ---------- ----------*/
