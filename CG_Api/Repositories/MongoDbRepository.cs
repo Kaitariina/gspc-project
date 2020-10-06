@@ -115,10 +115,22 @@ class MongoDbRepository : IRepository
     {
         FilterDefinition<Player> filter = Builders<Player>.Filter.Eq(p => p.Id, playerId);
         Player player = await _playerCollection.Find(filter).FirstAsync();
+        Rank newRank = Rank.NOVICE;
 
+        if (player.Rank == Rank.PROFESSIONAL)
+        {
+            newRank = Rank.AMATEUR;
+        }
+        else if (player.Rank == Rank.AMATEUR)
+        {
+            newRank = Rank.NOVICE;
+        }
+
+        var rankUpdate = Builders<Player>.Update.Set(p => p.Rank, newRank);
         var ban = Builders<Player>.Update.Set(p => p.IsBanned, true);
+        var combine = Builders<Player>.Update.Combine(rankUpdate, ban);
 
-        return await _playerCollection.FindOneAndUpdateAsync(filter, ban);
+        return await _playerCollection.FindOneAndUpdateAsync(filter, combine);
     }
 
     public async Task<Player> UnBanPlayer(Guid playerId)

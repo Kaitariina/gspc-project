@@ -37,7 +37,7 @@ public class PlayersController
             IsBanned = false,
             CreationTime = DateTime.UtcNow,
             DecksOwned = decks,
-            Rank = Rank.AMATEUR,
+            Rank = Rank.NOVICE,
             Sessions = sessions
         };
 
