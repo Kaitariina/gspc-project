@@ -4,7 +4,7 @@
 
 The goal of this project was to create a **backend system** that could potentially be used in \
 a **digital collectible card game**. A game from this genre would typically offer nice amount \
-of diverse data to be stored and offer multiple interesting options for queries.
+of diverse data to be stored and multiple interesting options for queries.
 
 We used mongoDB to store the data & Postman to test and simulate the features.
 
